@@ -9,16 +9,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @org.springframework.web.bind.annotation.RestControllerAdvice
 public class RestControllerAdvice {
 
+
+
+
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleGenericException(Exception ex) {
+    public ResponseEntity<String> handleGenericException(Exception ex) {
     log.error("Something went wrong ",ex);
     return new ResponseEntity<>("Something went wrong!", HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-  @ExceptionHandler(EntityNotFoundException.class)
-  public ResponseEntity<String> handleEntityNotFound(EntityNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-  }
+
 
 
 

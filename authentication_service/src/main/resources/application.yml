@@ -1,4 +1,22 @@
 spring:
   application:
-            name: authentication_service
-  profiles: local
+    name: authentication_service
+  profiles:
+    active: local
+  datasource:
+    url: jdbc:postgresql://localhost:5400/auth_db
+    username: admin
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/master.xml
+    default-schema: public
+    contexts: dev
+
+logging:
+  level:
+    root: INFO

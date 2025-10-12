@@ -1,10 +1,11 @@
-package com.lnr.authentication_service.auth.domain.user.vo;
+package com.lnr.authentication_service.user.domain.user.vo;
 
 public enum FieldLength {
 
     FIRST_NAME(2, 50),
     LAST_NAME(2, 50),
     EMAIL(5, 254),
+    COUNTRY_CODE(3,5),
     PHONE_NUMBER(7, 15),
     ADDRESS(5, 250),
     PASSWORD(8, 128);
