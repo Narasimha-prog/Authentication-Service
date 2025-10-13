@@ -24,7 +24,8 @@ public class User {
     private final UserLastName lastName;
     //fix
     private final UserEmail userEmail;
-
+    //fix
+    private final UserPassword password;
 
     private UserAddress userAddress;
 
@@ -32,12 +33,16 @@ public class User {
 
     private UserImage userImage;
 
+
+
    //from db
     private UserDbId dbId;
 
-    public User(UserPublicId publicId, UserFirstName firstName, UserLastName lastName, UserEmail userEmail, UserAddress userAddress, UserPhoneNumber userPhoneNumber, UserDbId dbId) {
+    public User(UserPublicId publicId, UserFirstName firstName, UserLastName lastName, UserEmail userEmail, UserPassword password, UserAddress userAddress, UserPhoneNumber userPhoneNumber, UserDbId dbId,UserImage image) {
 
-        assertAllFields(firstName,lastName,userEmail);
+        assertAllFields(firstName,lastName,userEmail,password);
+
+        this.password = password;
         this.publicId = publicId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -45,6 +50,7 @@ public class User {
         this.userAddress = userAddress;
         this.userPhoneNumber = userPhoneNumber;
         this.dbId = dbId;
+        this.userImage=image;
     }
 
 
@@ -72,10 +78,12 @@ public class User {
 
 
 
-    private void assertAllFields(UserFirstName firstName,UserLastName lastName,UserEmail userEmail){
+    private void assertAllFields(UserFirstName firstName,UserLastName lastName,UserEmail userEmail,UserPassword password){
         Assert.notNull("FirstName",firstName);
         Assert.notNull("LastName",lastName);
         Assert.notNull("UserEmail",userEmail);
+        Assert.notNull("UserPassword",password);
+
 
     }
 }

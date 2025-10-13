@@ -25,6 +25,9 @@ public class SecurityConfig {
     "/actuator/health",
     "/actuator/info"
   };
+
+  private static final String[] PUBLIC_KEY_WHITELIST={"/.well-known/**"};
+
   @Bean
   public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
@@ -39,10 +42,11 @@ public class SecurityConfig {
         ).permitAll()
 
         // Public POST endpoints (webhooks)
-        .requestMatchers(HttpMethod.POST,
+        .requestMatchers(
           "/api/orders/webhook/**"
         ).permitAll()
 
+              .requestMatchers(HttpMethod.GET,PUBLIC_KEY_WHITELIST).permitAll()
         // Swagger UI / OpenAPI endpoints
         .requestMatchers(SWAGGER_WHITELIST).permitAll()
 

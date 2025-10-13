@@ -12,5 +12,6 @@
 
   <include file="00000000000001_user.xml" relativeToChangelogFile="true"/>
     <include file="00000000000002_authority.xml" relativeToChangelogFile="true" />
+    <include file="00000000000003_authority.xml" relativeToChangelogFile="true" />
 
 </databaseChangeLog>

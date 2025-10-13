@@ -5,13 +5,13 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="00000000000001-seq" author="lnr">
-        <createSequence sequenceName="user_sequence"  startValue="1" incrementBy="1"/>
+        <createSequence sequenceName="user_sequence" startValue="1" incrementBy="1"/>
     </changeSet>
 
     <changeSet id="00000000000001-user" author="lnr">
-        <createTable tableName="ecommerce_user">
-            <column name="id" type="bigint" >
-                <constraints primaryKey="true"  nullable="false" />
+        <createTable tableName="users">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="public_id" type="${uuidType}">
                 <constraints nullable="false" unique="true"/>
@@ -19,13 +19,28 @@
             <column name="first_name" type="varchar(50)"/>
             <column name="last_name" type="varchar(50)"/>
             <column name="email" type="varchar(255)">
-                <constraints unique="true" nullable="true" uniqueConstraintName="ux_user_email"/>
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_user_email"/>
             </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Address -->
             <column name="address_street" type="varchar(255)"/>
             <column name="address_zip_code" type="varchar(255)"/>
             <column name="address_city" type="varchar(255)"/>
             <column name="address_country" type="varchar(255)"/>
+
+            <!-- Phone -->
+            <column name="phone_country_code" type="varchar(10)"/>
+            <column name="phone_number" type="bigint"/>
+
+            <!-- Image -->
             <column name="image_url" type="varchar(256)"/>
+            <column name="image_data" type="bytea"/> <!-- if storing raw image instead of URL -->
+            <column name="image_type" type="varchar(10)"/> <!-- e.g., png, jpg -->
+
+            <!-- Timestamps -->
             <column name="last_seen" type="timestamp">
                 <constraints nullable="false"/>
             </column>
@@ -33,6 +48,4 @@
             <column name="last_modified_date" type="timestamp"/>
         </createTable>
     </changeSet>
-
-
 </databaseChangeLog>
