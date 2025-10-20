@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.ToString;
 import org.jilt.Builder;
 
-import java.util.UUID;
-
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
@@ -26,6 +24,8 @@ public class User {
     private final UserEmail userEmail;
     //fix
     private final UserPassword password;
+    //fix
+    private final UserLastSeen lastSeen;
 
     private UserAddress userAddress;
 
@@ -38,9 +38,10 @@ public class User {
    //from db
     private UserDbId dbId;
 
-    public User(UserPublicId publicId, UserFirstName firstName, UserLastName lastName, UserEmail userEmail, UserPassword password, UserAddress userAddress, UserPhoneNumber userPhoneNumber, UserDbId dbId,UserImage image) {
+    public User(UserPublicId publicId, UserFirstName firstName, UserLastName lastName, UserEmail userEmail, UserPassword password, UserLastSeen lastSeen, UserAddress userAddress, UserPhoneNumber userPhoneNumber, UserImage image,UserDbId dbId) {
+        this.lastSeen = lastSeen;
 
-        assertAllFields(firstName,lastName,userEmail,password);
+        assertAllFields(firstName,lastName,userEmail,password,lastSeen);
 
         this.password = password;
         this.publicId = publicId;
@@ -78,11 +79,12 @@ public class User {
 
 
 
-    private void assertAllFields(UserFirstName firstName,UserLastName lastName,UserEmail userEmail,UserPassword password){
+    private void assertAllFields(UserFirstName firstName, UserLastName lastName, UserEmail userEmail, UserPassword password, UserLastSeen lastSeen){
         Assert.notNull("FirstName",firstName);
         Assert.notNull("LastName",lastName);
         Assert.notNull("UserEmail",userEmail);
         Assert.notNull("UserPassword",password);
+        Assert.notNull("UserLastSeen",lastSeen);
 
 
     }

@@ -1,6 +1,7 @@
 package com.lnr.authentication_service.auth.infrastructure.primary;
 
-import com.lnr.authentication_service.user.domain.user.service.UserService;
+import com.lnr.authentication_service.auth.application.AuthApplicationService;
+import com.lnr.authentication_service.auth.infrastructure.primary.dto.RestRegister;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,8 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthRestResource {
 
-    private final UserService userService;
-    private final JwtService jwtService;
+    private AuthApplicationService service;
 
 
     @PostMapping("/login")

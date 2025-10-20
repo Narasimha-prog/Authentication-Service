@@ -1,4 +1,4 @@
-package com.lnr.authentication_service.auth.infrastructure.primary;
+package com.lnr.authentication_service.auth.infrastructure.seconadary.services;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

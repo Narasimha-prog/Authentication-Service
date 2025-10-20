@@ -1,4 +1,4 @@
-package com.lnr.authentication_service.auth.domain;
+package com.lnr.authentication_service.auth.domain.vo;
 
 
 
@@ -27,6 +27,7 @@ public record Roles(Set<Role> roles) {
 
     return roles.contains(role);
   }
+
 
   public Stream<Role> stream() {
     return get().stream();

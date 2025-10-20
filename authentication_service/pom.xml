@@ -115,6 +115,11 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</path>
+                        <path>
+                            <groupId>cc.jilt</groupId>
+                            <artifactId>jilt</artifactId>
+                            <version>1.8.3</version>
+                        </path>
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>

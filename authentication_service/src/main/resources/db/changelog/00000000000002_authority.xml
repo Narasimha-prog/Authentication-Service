@@ -33,7 +33,7 @@
                                  baseTableName="user_authority"
                                  constraintName="fk_user_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="ecommerce_user"/>
+                                 referencedTableName="users"/>
         <loadData
                 file="db/data/authority.csv"
                 separator=";"

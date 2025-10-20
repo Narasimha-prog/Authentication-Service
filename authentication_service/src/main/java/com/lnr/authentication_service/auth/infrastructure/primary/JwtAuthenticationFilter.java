@@ -1,5 +1,6 @@
 package com.lnr.authentication_service.auth.infrastructure.primary;
 
+import com.lnr.authentication_service.auth.infrastructure.seconadary.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

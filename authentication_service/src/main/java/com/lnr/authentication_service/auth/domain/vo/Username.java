@@ -1,4 +1,4 @@
-package com.lnr.authentication_service.auth.domain;
+package com.lnr.authentication_service.auth.domain.vo;
 
 
 
