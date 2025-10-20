@@ -1,11 +1,8 @@
 package com.lnr.authentication_service.auth.domain.account.aggrigate;
-
+import com.lnr.authentication_service.auth.domain.account.vo.*;
+import com.lnr.authentication_service.shared.domain.user.vo.UserEmail;
+import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
 import com.lnr.authentication_service.shared.error.domain.Assert;
-import com.lnr.authentication_service.user.domain.profile.vo.UserDbId;
-import com.lnr.authentication_service.user.domain.profile.vo.UserPublicId;
-import com.lnr.authentication_service.auth.domain.account.vo.UserEmail;
-import com.lnr.authentication_service.auth.domain.account.vo.UserLastSeen;
-import com.lnr.authentication_service.auth.domain.account.vo.UserPassword;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -30,7 +27,7 @@ public class UserAccount {
 
     private final Set<Role> roles;     // roles for authorization
 
-    private final long dbId;           // local DB PK (internal only)
+    private final AccountDbId dbId;           // local DB PK (internal only)
 
     // All-args constructor
     public UserAccount(UserPublicId publicId,
@@ -38,8 +35,8 @@ public class UserAccount {
                        UserPassword password,
                        UserLastSeen lastSeen,
                        Set<Role> roles,
-                       long dbId) {
-        assertAllFields(publicId, email, password, lastSeen);
+                       AccountDbId dbId) {
+        assertAllFields(publicId, email, password, lastSeen,dbId);
         this.publicId = publicId;
         this.email = email;
         this.password = password;
@@ -54,15 +51,24 @@ public class UserAccount {
                        UserPassword password,
                        UserLastSeen lastSeen,
                        Set<Role> roles) {
-        this(publicId, email, password, lastSeen, roles, 0L);
+        this(publicId, email, password, lastSeen, roles, new AccountDbId(0L));
+    }
+
+    public UserAccount(UserPublicId publicId,
+                       UserEmail email,
+                       UserPassword password,
+                       UserLastSeen lastSeen
+                      ) {
+        this(publicId, email, password, lastSeen, Set.of(new Role(RoleName.USER,Set.of(new Authority(AuthorityName.USER_READ)))), new AccountDbId(0L));
     }
 
     private void assertAllFields(UserPublicId publicId, UserEmail email,
-                                 UserPassword password, UserLastSeen lastSeen) {
+                                 UserPassword password, UserLastSeen lastSeen,AccountDbId dbId) {
         Assert.notNull("UserPublicId", publicId);
         Assert.notNull("UserEmail", email);
         Assert.notNull("UserPassword", password);
         Assert.notNull("UserLastSeen", lastSeen);
+        Assert.notNull("UserAccountDbId",dbId);
     }
 }
 

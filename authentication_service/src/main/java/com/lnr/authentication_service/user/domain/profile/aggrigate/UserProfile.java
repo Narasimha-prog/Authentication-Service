@@ -1,5 +1,7 @@
 package com.lnr.authentication_service.user.domain.profile.aggrigate;
 
+import com.lnr.authentication_service.shared.domain.user.vo.UserEmail;
+import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
 import com.lnr.authentication_service.shared.error.domain.Assert;
 import com.lnr.authentication_service.user.domain.profile.vo.*;
 import lombok.EqualsAndHashCode;
@@ -22,10 +24,7 @@ public class UserProfile {
     private final UserLastName lastName;
     //fix
     private final UserEmail userEmail;
-    //fix
-    private final UserPassword password;
-    //fix
-    private final UserLastSeen lastSeen;
+
 
     private UserAddress userAddress;
 
@@ -35,14 +34,12 @@ public class UserProfile {
 
 
    //from db
-    private UserDbId dbId;
+    private final UserDbId dbId;
 
-    public UserProfile(UserPublicId publicId, UserFirstName firstName, UserLastName lastName, UserEmail userEmail, UserPassword password, UserLastSeen lastSeen, UserAddress userAddress, UserPhoneNumber userPhoneNumber, UserImage image,UserDbId dbId) {
-        this.lastSeen = lastSeen;
+    public UserProfile(UserPublicId publicId, UserFirstName firstName, UserLastName lastName, UserEmail userEmail, UserAddress userAddress, UserPhoneNumber userPhoneNumber, UserImage image,UserDbId dbId) {
 
-        assertAllFields(firstName,lastName,userEmail,password,lastSeen);
+        assertAllFields(firstName,lastName,userEmail,dbId);
 
-        this.password = password;
         this.publicId = publicId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -78,12 +75,11 @@ public class UserProfile {
 
 
 
-    private void assertAllFields(UserFirstName firstName, UserLastName lastName, UserEmail userEmail, UserPassword password, UserLastSeen lastSeen){
+    private void assertAllFields(UserFirstName firstName, UserLastName lastName, UserEmail userEmail,UserDbId dbId){
         Assert.notNull("FirstName",firstName);
         Assert.notNull("LastName",lastName);
         Assert.notNull("UserEmail",userEmail);
-        Assert.notNull("UserPassword",password);
-        Assert.notNull("UserLastSeen",lastSeen);
+        Assert.notNull("UserProfileDbId",dbId);
 
 
     }

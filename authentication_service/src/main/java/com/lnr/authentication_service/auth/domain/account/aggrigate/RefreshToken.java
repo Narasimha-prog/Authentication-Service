@@ -1,7 +1,8 @@
-package com.lnr.authentication_service.auth.domain.token.aggregate;
+package com.lnr.authentication_service.auth.domain.account.aggrigate;
 
+import com.lnr.authentication_service.auth.domain.account.vo.RefreshDbId;
+import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
 import com.lnr.authentication_service.shared.error.domain.Assert;
-import com.lnr.authentication_service.user.domain.profile.vo.UserPublicId;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -19,13 +20,15 @@ public class RefreshToken {
     private final String token;          // unique token string
 
     private final UserPublicId userId;   // links to UserAccount
+
     private final Instant expiryDate;    // token expiration
+
     private boolean revoked;             // flag for invalidation
 
-    private final long dbId;
+    private final RefreshDbId dbId;
 
     // All-args constructor
-    public RefreshToken(String token, UserPublicId userId, Instant expiryDate, boolean revoked,long bdId) {
+    public RefreshToken(String token, UserPublicId userId, Instant expiryDate, boolean revoked,RefreshDbId bdId) {
         assertAllFields(token, userId, expiryDate,bdId);
         this.token = token;
         this.userId = userId;
@@ -36,10 +39,10 @@ public class RefreshToken {
 
     // Convenience constructor for new tokens
     public RefreshToken(String token, UserPublicId userId, Instant expiryDate) {
-        this(token, userId, expiryDate, false, 0L);
+        this(token, userId, expiryDate, false, new RefreshDbId(0L));
     }
 
-    private void assertAllFields(String token, UserPublicId userId, Instant expiryDate,long dbId) {
+    private void assertAllFields(String token, UserPublicId userId, Instant expiryDate,RefreshDbId dbId) {
         Assert.notNull("Token", token);
         Assert.notNull("UserPublicId", userId);
         Assert.notNull("ExpiryDate", expiryDate);

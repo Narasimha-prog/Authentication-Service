@@ -1,4 +1,4 @@
-package com.lnr.authentication_service.user.domain.profile.vo;
+package com.lnr.authentication_service.shared.domain.user.vo;
 
 import com.lnr.authentication_service.shared.error.domain.Assert;
 import org.jilt.Builder;

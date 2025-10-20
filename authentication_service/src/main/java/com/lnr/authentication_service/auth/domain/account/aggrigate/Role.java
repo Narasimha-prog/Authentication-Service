@@ -1,5 +1,6 @@
 package com.lnr.authentication_service.auth.domain.account.aggrigate;
 
+import com.lnr.authentication_service.auth.domain.account.vo.RoleDbId;
 import com.lnr.authentication_service.auth.domain.account.vo.RoleName;
 import com.lnr.authentication_service.shared.error.domain.Assert;
 import lombok.EqualsAndHashCode;
@@ -19,11 +20,11 @@ public class Role {
     private final RoleName name;
 
     private final Set<Authority> authorities;
-    private  final long dbId;
+    private  final RoleDbId dbId;
 
     // All-args constructor
-    public Role(RoleName name, Set<Authority> authorities, long dbId) {
-        assertAllFields(name, authorities);
+    public Role(RoleName name, Set<Authority> authorities, RoleDbId dbId) {
+        assertAllFields(name, authorities,dbId);
         this.name = name;
         this.authorities = Set.copyOf(authorities); // make immutable
         this.dbId = dbId;
@@ -31,12 +32,13 @@ public class Role {
 
     // Convenience constructor for new roles without dbId
     public Role(RoleName name, Set<Authority> authorities) {
-        this(name, authorities, 0L); // dbId = 0 indicates not persisted yet
+        this(name, authorities, new RoleDbId(0L)); // dbId = 0 indicates not persisted yet
     }
 
-    public void assertAllFields(RoleName name, Set<Authority> authorities){
+    public void assertAllFields(RoleName name, Set<Authority> authorities,RoleDbId dbId){
         Assert.notNull("RoleName",name);
         Assert.notNull("Authority Set",authorities);
+        Assert.notNull("RoleDbId",dbId);
     }
 
 }

@@ -28,8 +28,7 @@
 |---------------------------|
 |  + UserPublicId (UUID)    |  <- shared between Auth & User services
 |  + UserEmail VO           |
-|  + RoleName VO            |
-|  + AuthorityName VO       |
+|
 +---------------------------+
                                Entity Objects
                                ---------

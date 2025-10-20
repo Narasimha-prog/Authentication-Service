@@ -1,11 +1,11 @@
 package com.lnr.authentication_service.user.infrastrature.seconadary.repository;
 
-import com.lnr.authentication_service.user.domain.user.aggrigate.User;
-import com.lnr.authentication_service.user.domain.user.repository.IUserRepository;
-import com.lnr.authentication_service.auth.domain.account.vo.UserEmail;
-import com.lnr.authentication_service.user.domain.profile.vo.UserPublicId;
-import com.lnr.authentication_service.user.infrastrature.seconadary.entity.UserEntity;
-import jakarta.persistence.EntityNotFoundException;
+import com.lnr.authentication_service.shared.domain.user.vo.UserEmail;
+import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
+import com.lnr.authentication_service.shared.error.domain.UserProfileIsNotFound;
+import com.lnr.authentication_service.user.domain.profile.aggrigate.UserProfile;
+import com.lnr.authentication_service.user.domain.profile.repository.IUserRepository;
+import com.lnr.authentication_service.user.infrastrature.seconadary.entity.UserProfileEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,23 +21,23 @@ public class SpringDataUserRepository implements IUserRepository {
 
 
     @Override
-    public void save(User user) {
-      UserEntity.toDomain(jpaUserRepository.save(UserEntity.toEntity(user)));
+    public void save(UserProfile user) {
+      UserProfileEntity.toDomain(jpaUserRepository.save(UserProfileEntity.toEntity(user)));
 
     }
 
     @Override
-    public Optional<User> get(UserPublicId publicId) {
-        return  jpaUserRepository.findByPublicId(publicId.value()).map(UserEntity::toDomain);
+    public Optional<UserProfile> get(UserPublicId publicId) {
+        return  jpaUserRepository.findByPublicId(publicId.value()).map(UserProfileEntity::toDomain);
     }
 
     @Override
-    public Optional<User> findByEmail(UserEmail email) {
-        return Optional.of(UserEntity.toDomain(jpaUserRepository.findByEmail(email.value()).orElseThrow(() -> new EntityNotFoundException("Entity is not found with email.."))));
+    public Optional<UserProfile> findByEmail(UserEmail email) {
+        return Optional.of(UserProfileEntity.toDomain(jpaUserRepository.findByEmail(email.value()).orElseThrow(() -> new UserProfileIsNotFound("UserProfile is not there with this Email"))));
     }
-
-    @Override
-    public Page<User> findAll(Pageable  pageable) {
-        return   jpaUserRepository.findAll(pageable).map(UserEntity::toDomain);
-    }
+//
+//    @Override
+//    public Page<UserProfile> findAll(Pageable  pageable) {
+//        return   jpaUserRepository.findAll(pageable).map(UserProfileEntity::toDomain);
+//    }
 }

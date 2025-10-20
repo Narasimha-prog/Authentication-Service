@@ -1,5 +1,5 @@
 package com.lnr.authentication_service.auth.infrastructure.seconadary.entity;
-import com.lnr.authentication_service.user.infrastrature.seconadary.entity.UserEntity;
+import com.lnr.authentication_service.user.infrastrature.seconadary.entity.UserProfileEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,7 +24,7 @@ public class AuthorityEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user; // link to the user table
+    private UserAccountEntity user; // link to the user table
 
     @Column(nullable = false)
     private boolean enabled = true;
@@ -35,5 +35,5 @@ public class AuthorityEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "authority_name")
     )
-    private Set<RolesEntity> authorities;
+    private Set<RoleEntity> authorities;
 }

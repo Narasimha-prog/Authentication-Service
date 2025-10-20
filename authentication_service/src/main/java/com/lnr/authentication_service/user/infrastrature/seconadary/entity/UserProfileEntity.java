@@ -1,11 +1,11 @@
 package com.lnr.authentication_service.user.infrastrature.seconadary.entity;
 
 
-import com.lnr.authentication_service.auth.domain.account.vo.UserEmail;
-import com.lnr.authentication_service.auth.domain.account.vo.UserLastSeen;
+import com.lnr.authentication_service.shared.domain.user.vo.UserEmail;
 import com.lnr.authentication_service.shared.jpa.AbstractAuditingEntity;
+import com.lnr.authentication_service.user.domain.profile.aggrigate.UserProfile;
+import com.lnr.authentication_service.user.domain.profile.aggrigate.UserProfileBuilder;
 import com.lnr.authentication_service.user.domain.profile.vo.*;
-import com.lnr.authentication_service.user.domain.user.aggrigate.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class UserEntity extends AbstractAuditingEntity<Long> {
+public class UserProfileEntity extends AbstractAuditingEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "user_seq")
@@ -64,10 +64,9 @@ public class UserEntity extends AbstractAuditingEntity<Long> {
     @Column(name = "image_type")
     private String imageType;
 
-    @Column(name = "last_seen", nullable = false)
-    private java.time.Instant lastSeen;
 
-    public static UserEntity toEntity(User user) {
+
+    public static UserProfileEntity toEntity(UserProfile user) {
         if (user == null) {
             throw new IllegalArgumentException("User must not be null");
         }
@@ -83,11 +82,9 @@ public class UserEntity extends AbstractAuditingEntity<Long> {
         if (user.getPublicId() == null) {
             throw new IllegalArgumentException("PublicId must not be null");
         }
-        if (user.getLastSeen() == null) {
-            throw new IllegalArgumentException("LastSeen must not be null");
-        }
 
-        return UserEntity.builder()
+
+        return UserProfileEntity.builder()
                 .publicId(user.getPublicId().value())
                 .firstName(user.getFirstName().value())
                 .lastName(user.getLastName().value())
@@ -100,12 +97,13 @@ public class UserEntity extends AbstractAuditingEntity<Long> {
                 .phoneNumber(user.getUserPhoneNumber().number() != 0 ? user.getUserPhoneNumber().number() : null)
                 .imageData(user.getUserImage().value()!= null ? user.getUserImage().value() : null)
                 .imageType(user.getUserImage().imagetype() != null ? user.getUserImage().imagetype() : null)
-                .lastSeen(user.getLastSeen().value())
                 .build();
     }
 
 
-    public static User toDomain(UserEntity entity) {
+    public static UserProfile toDomain(UserProfileEntity entity) {
+
+        UserProfileBuilder entityBuilder= UserProfileBuilder.userProfile();
         if (entity == null) {
             throw new IllegalArgumentException("UserEntity must not be null");
         }
@@ -114,6 +112,8 @@ public class UserEntity extends AbstractAuditingEntity<Long> {
         UserPhoneNumber phone = null;
         if (entity.getCountryCode() != null && entity.getPhoneNumber() != null) {
             phone = new UserPhoneNumber(entity.getCountryCode(), entity.getPhoneNumber());
+
+            entityBuilder.userPhoneNumber(phone);
         }
 
         // Map address
@@ -126,26 +126,19 @@ public class UserEntity extends AbstractAuditingEntity<Long> {
                     entity.getZipCode(),
                     entity.getCountry()
             );
+
+            entityBuilder.userAddress(address);
         }
 
         // Map image
         UserImage image = null;
         if (entity.getImageData() != null && entity.getImageType() != null) {
             image = new UserImage(entity.getImageData(), entity.getImageType());
+
+            entityBuilder.userImage(image);
         }
 
-        return new User(
-                new UserPublicId(entity.getPublicId()),
-                new UserFirstName(entity.getFirstName()),
-                new UserLastName(entity.getLastName()),
-                new UserEmail(entity.getEmail()),
-                null, // password is not loaded in domain for security reasons
-                new UserLastSeen(entity.getLastSeen()),
-                address,
-                phone,
-                image,
-                new UserDbId(entity.getId())
-        );
+        return  entityBuilder.firstName(new UserFirstName(entity.firstName)).lastName(new UserLastName(entity.lastName)).userEmail(new UserEmail(entity.email)).build();
     }
 
 

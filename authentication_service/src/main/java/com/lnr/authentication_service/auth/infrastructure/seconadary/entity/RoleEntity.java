@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RolesEntity {
+public class RoleEntity {
 
     @Id
     @Column(length = 50)
