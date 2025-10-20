@@ -2,8 +2,8 @@ package com.lnr.authentication_service.user.infrastrature.seconadary.repository;
 
 import com.lnr.authentication_service.user.domain.user.aggrigate.User;
 import com.lnr.authentication_service.user.domain.user.repository.IUserRepository;
-import com.lnr.authentication_service.user.domain.user.vo.UserEmail;
-import com.lnr.authentication_service.user.domain.user.vo.UserPublicId;
+import com.lnr.authentication_service.auth.domain.account.vo.UserEmail;
+import com.lnr.authentication_service.user.domain.profile.vo.UserPublicId;
 import com.lnr.authentication_service.user.infrastrature.seconadary.entity.UserEntity;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,8 +21,8 @@ public class SpringDataUserRepository implements IUserRepository {
 
 
     @Override
-    public User save(User user) {
-     return UserEntity.toDomain(jpaUserRepository.save(UserEntity.toEntity(user)));
+    public void save(User user) {
+      UserEntity.toDomain(jpaUserRepository.save(UserEntity.toEntity(user)));
 
     }
 

@@ -1,0 +1,76 @@
+
+                    Domain Objects
+                    --------------
+
++---------------------------+            +---------------------------+
+|        Auth Service       |            |        User Service       |
+|---------------------------|            |---------------------------|
+|  Domain: UserAccount      |            |  Domain: UserProfile      |
+|---------------------------|            |---------------------------|
+|  + UserPublicId           |<--------+  |  + UserPublicId           |
+|  + loginEmail             |         |  |  + firstName             |
+|  + password               |         |  |  + lastName              |
+|  + roles (Role aggregate) |         |  |  + contactEmail          |
+|  + authorities            |         |  |  + address               |
+|  + lastSeen               |         |  |  + phoneNumber           |
+|  + refreshTokens          |         |  |  + image                 |
++---------------------------+         |  +-------------------------+
+          | JWT / Token Claims        |
+          |-------------------------->|  Validate token / extract sub
+          |                             (UserPublicId)
+          |
+          | publishes UserCreatedEvent
+          |-------------------------->|
+                                        (UserProfile created with same UserPublicId)
+
++---------------------------+
+|       Shared Domain       |
+|---------------------------|
+|  + UserPublicId (UUID)    |  <- shared between Auth & User services
+|  + UserEmail VO           |
+|  + RoleName VO            |
+|  + AuthorityName VO       |
++---------------------------+
+                               Entity Objects
+                               ---------
+
+                               +-----------------------+
+                               |      UserAccount      |
+                               +-----------------------+
+                               | publicId             |
+                               | email                |
+                               | password             |
+                               | lastSeen             |
+                               +-----------------------+
+                                      | 1..n assignedRoles
+                                      | (Set<Role> assignedRoles)
+                                      v
+                               +-----------------------+
+                               |         Role          |
+                               +-----------------------+
+                               | dbId                 |
+                               | name                 |
+                               +-----------------------+
+                                      | 1..n roleAuthorities
+                                      | (Set<Authority> roleAuthorities)
+                                      v
+                               +-----------------------+
+                               |       Authority       |
+                               +-----------------------+
+                               | dbId                 |
+                               | name                 |
+                               +-----------------------+
+
+                               +-----------------------+
+                               |     RefreshToken      |
+                               +-----------------------+
+                               | dbId                 |
+                               | token                |
+                               | userId               |
+                               | expiryDate           |
+                               | revoked              |
+                               +-----------------------+
+                                      ^ 0..n userTokens
+                                      | (Set<RefreshToken> userTokens)
+                                      |
+                                 UserAccount

@@ -1,7 +1,10 @@
 package com.lnr.authentication_service.auth.infrastructure.primary.dto;
 
+import com.lnr.authentication_service.auth.domain.account.vo.UserEmail;
+import com.lnr.authentication_service.auth.domain.account.vo.UserLastSeen;
+import com.lnr.authentication_service.auth.domain.account.vo.UserPassword;
+import com.lnr.authentication_service.user.domain.profile.vo.*;
 import com.lnr.authentication_service.user.domain.user.aggrigate.User;
-import com.lnr.authentication_service.user.domain.user.vo.*;
 import org.jilt.Builder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

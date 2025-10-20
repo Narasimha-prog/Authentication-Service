@@ -1,9 +1,11 @@
 package com.lnr.authentication_service.user.infrastrature.seconadary.entity;
 
 
+import com.lnr.authentication_service.auth.domain.account.vo.UserEmail;
+import com.lnr.authentication_service.auth.domain.account.vo.UserLastSeen;
 import com.lnr.authentication_service.shared.jpa.AbstractAuditingEntity;
+import com.lnr.authentication_service.user.domain.profile.vo.*;
 import com.lnr.authentication_service.user.domain.user.aggrigate.User;
-import com.lnr.authentication_service.user.domain.user.vo.*;
 import jakarta.persistence.*;
 import lombok.*;
 

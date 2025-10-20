@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/auth/api")
 @RequiredArgsConstructor
 public class AuthRestResource {
 
@@ -22,4 +22,6 @@ public class AuthRestResource {
     public Long validateToken(@RequestParam String token) {
         return  null;
     }
+
+
 }
