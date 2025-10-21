@@ -1,75 +1,97 @@
 
-                    Domain Objects
-                    --------------
+             1 Domain Layer (Pure DDD Aggregates)
+             +-----------------------+
+             |      UserAccount      |
+             +-----------------------+
+             | - publicId: UUID      |
+             | - email: UserEmail    |
+             | - password: UserPassword |
+             | - lastSeen: UserLastSeen |
+             | - roles: Set<Role>    |
+             +-----------------------+
+                       |
+                       | aggregates
+                       v
+             +-----------------------+
+             |         Role          |
+             +-----------------------+
+             | - name: RoleName      |
+             | - authorities: Set<Authority> |
+             +-----------------------+
+                       |
+                       | aggregates
+                       v
+             +-----------------------+
+             |       Authority       |
+             +-----------------------+
+             | - name: AuthorityName |
+             +-----------------------+
 
-+---------------------------+            +---------------------------+
-|        Auth Service       |            |        User Service       |
-|---------------------------|            |---------------------------|
-|  Domain: UserAccount      |            |  Domain: UserProfile      |
-|---------------------------|            |---------------------------|
-|  + UserPublicId           |<--------+  |  + UserPublicId           |
-|  + loginEmail             |         |  |  + firstName             |
-|  + password               |         |  |  + lastName              |
-|  + roles (Role aggregate) |         |  |  + contactEmail          |
-|  + authorities            |         |  |  + address               |
-|  + lastSeen               |         |  |  + phoneNumber           |
-|  + refreshTokens          |         |  |  + image                 |
-+---------------------------+         |  +-------------------------+
-          | JWT / Token Claims        |
-          |-------------------------->|  Validate token / extract sub
-          |                             (UserPublicId)
-          |
-          | publishes UserCreatedEvent
-          |-------------------------->|
-                                        (UserProfile created with same UserPublicId)
 
-+---------------------------+
-|       Shared Domain       |
-|---------------------------|
-|  + UserPublicId (UUID)    |  <- shared between Auth & User services
-|  + UserEmail VO           |
-|
-+---------------------------+
-                               Entity Objects
-                               ---------
+             Notes:
 
-                               +-----------------------+
-                               |      UserAccount      |
-                               +-----------------------+
-                               | publicId             |
-                               | email                |
-                               | password             |
-                               | lastSeen             |
-                               +-----------------------+
-                                      | 1..n assignedRoles
-                                      | (Set<Role> assignedRoles)
-                                      v
-                               +-----------------------+
-                               |         Role          |
-                               +-----------------------+
-                               | dbId                 |
-                               | name                 |
-                               +-----------------------+
-                                      | 1..n roleAuthorities
-                                      | (Set<Authority> roleAuthorities)
-                                      v
-                               +-----------------------+
-                               |       Authority       |
-                               +-----------------------+
-                               | dbId                 |
-                               | name                 |
-                               +-----------------------+
+             Aggregates are conceptual, not persistent objects.
 
-                               +-----------------------+
-                               |     RefreshToken      |
-                               +-----------------------+
-                               | dbId                 |
-                               | token                |
-                               | userId               |
-                               | expiryDate           |
-                               | revoked              |
-                               +-----------------------+
-                                      ^ 0..n userTokens
-                                      | (Set<RefreshToken> userTokens)
-                                      |
-                                 UserAccount
+             Role and Authority do not reference parent (UserAccount) in domain.
+
+             All relationships are by composition for conceptual clarity.
+
+             2 Entity Layer (JPA / Infrastructure)
+             +---------------------------+
+             |      UserAccountEntity    |
+             +---------------------------+
+             | dbId: Long                |
+             | publicId: UUID            |
+             | email: String             |
+             | password: String          |
+             | lastSeen: Instant         |
+             +---------------------------+
+                       | 1..n
+                       | mappedBy="user"
+                       v
+             +---------------------------+
+             |        RoleEntity         |
+             +---------------------------+
+             | dbId: Long                |
+             | publicId: UUID            |
+             | name: RoleName            |
+             | user_id: FK -> UserAccountEntity.dbId |
+             +---------------------------+
+                       | 1..n
+                       | mappedBy="role"
+                       v
+             +---------------------------+
+             |      AuthorityEntity      |
+             +---------------------------+
+             | dbId: Long                |
+             | publicId: UUID            |
+             | name: AuthorityName       |
+             | role_id: FK -> RoleEntity.dbId |
+             +---------------------------+
+
+             +---------------------------+
+             |     RefreshTokenEntity    |
+             +---------------------------+
+             | dbId: Long                |
+             | publicId: UUID            |
+             | token: String             |
+             | expiryDate: Instant       |
+             | revoked: Boolean          |
+             | user_id: FK -> UserAccountEntity.dbId |
+             +---------------------------+
+
+
+             Notes:
+
+             JPA entities have actual foreign key references (user_id, role_id).
+
+             mappedBy indicates bidirectional mapping where needed.
+
+             RefreshTokenEntity links directly to UserAccountEntity.
+
+             Entities handle persistence, domain remains clean and independent.
+
+             ✅ Summary
+             Layer	Reference Style	Who owns whom
+             Domain	Conceptual aggregates (Set<Role>, Set<Authority>)	UserAccount owns Roles, Role owns Authoritys
+             Entity	Foreign keys / JPA relationships	RoleEntity.user, AuthorityEntity.role, RefreshTokenEntity.user

@@ -1,4 +1,5 @@
 package com.lnr.authentication_service.auth.infrastructure.seconadary.entity;
+import com.lnr.authentication_service.auth.domain.account.vo.AuthorityName;
 import com.lnr.authentication_service.user.infrastrature.seconadary.entity.UserProfileEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,18 +23,33 @@ public class AuthorityEntity {
     @Column(nullable = false, unique = true)
     private UUID publicId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false)
+    private AuthorityName  name;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", nullable = false)
+    private RoleEntity role;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private UserAccountEntity user; // link to the user table
+    private UserAccountEntity user;
 
     @Column(nullable = false)
     private boolean enabled = true;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_authority",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "authority_name")
-    )
-    private Set<RoleEntity> authorities;
+    // --- Mappers ---
+    public com.lnr.authentication_service.auth.domain.account.aggrigate.Authority toDomain() {
+        return new com.lnr.authentication_service.auth.domain.account.aggrigate.Authority(name);
+    }
+
+    public static AuthorityEntity fromDomain(com.lnr.authentication_service.auth.domain.account.aggrigate.Authority authority) {
+        return AuthorityEntity.builder()
+                .publicId(UUID.randomUUID())
+                .name(authority.getName())
+                .enabled(true)
+                .build();
+    }
+
 }

@@ -1,16 +1,19 @@
 package com.lnr.authentication_service.auth.infrastructure.seconadary.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount;
+import com.lnr.authentication_service.auth.domain.account.vo.RoleName;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 @Entity
-@Table(name = "authority")
+@Table(name = "roles")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +21,44 @@ import lombok.NoArgsConstructor;
 public class RoleEntity {
 
     @Id
-    @Column(length = 50)
-    private String name;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    private UUID publicId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false)
+    private RoleName name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserAccountEntity user; // Owner reference
+
+    @OneToMany(orphanRemoval = false)
+    private Set<AuthorityEntity> authorities;
+
+    // --- Mappers ---
+    public com.lnr.authentication_service.auth.domain.account.aggrigate.Role toDomain() {
+        Set<com.lnr.authentication_service.auth.domain.account.aggrigate.Authority> auths = authorities.stream()
+                .map(AuthorityEntity::toDomain)
+                .collect(Collectors.toSet());
+        return new com.lnr.authentication_service.auth.domain.account.aggrigate.Role(name, auths);
+    }
+
+    public static RoleEntity fromDomain(com.lnr.authentication_service.auth.domain.account.aggrigate.Role roleDomain) {
+        Set<AuthorityEntity> authorityEntities = roleDomain.getAuthorities().stream()
+                .map(AuthorityEntity::fromDomain)
+                .collect(Collectors.toSet());
+
+        RoleEntity roleEntity = RoleEntity.builder()
+                .publicId(UUID.randomUUID())
+                .name(roleDomain.getName())
+                .authorities(authorityEntities)
+                .build();
+
+        // Link each authority back to role
+        authorityEntities.forEach(auth -> auth.setRole(roleEntity));
+
+        return roleEntity;
+    }
 }

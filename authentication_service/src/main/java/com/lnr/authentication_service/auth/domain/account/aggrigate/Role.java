@@ -20,6 +20,7 @@ public class Role {
     private final RoleName name;
 
     private final Set<Authority> authorities;
+
     private  final RoleDbId dbId;
 
     // All-args constructor
