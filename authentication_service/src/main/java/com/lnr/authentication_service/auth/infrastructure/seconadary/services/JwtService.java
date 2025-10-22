@@ -1,4 +1,4 @@
-package com.lnr.authentication_service.auth.infrastructure.primary;
+package com.lnr.authentication_service.auth.infrastructure.seconadary.services;
 
 import com.lnr.authentication_service.auth.domain.account.aggrigate.Role;
 import com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount;
@@ -88,5 +88,14 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    // --- getters for expiration times ---
+    public long getAccessTokenExpiration() {
+        return ACCESS_TOKEN_EXPIRATION;
+    }
+
+    public long getRefreshTokenExpiration() {
+        return REFRESH_TOKEN_EXPIRATION;
     }
 }

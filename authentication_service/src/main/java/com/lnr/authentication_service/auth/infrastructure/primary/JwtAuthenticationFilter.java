@@ -1,5 +1,7 @@
 package com.lnr.authentication_service.auth.infrastructure.primary;
 
+import com.lnr.authentication_service.auth.application.AccountApplicationService;
+import com.lnr.authentication_service.auth.infrastructure.seconadary.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,13 +15,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final AccountApplicationService service; // repo to check user
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -34,34 +37,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7); // Remove "Bearer "
+
         try {
             var claims = jwtService.extractClaims(token);
 
-            var userId = claims.getSubject(); // sub
+            // Extract user publicId from token
+            String userPublicId = claims.getSubject();
+
+            // ✅ Check if user exists in DB
+            var userEntityOpt = service.findAccountByPublicId(UUID.fromString(userPublicId));
+            if (userEntityOpt != null) {
+                SecurityContextHolder.clearContext();
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid user");
+                return;
+            }
+
+            // Extract roles and authorities from claims
             @SuppressWarnings("unchecked")
-            var roles = (List<String>) claims.get("roles"); // roles claim
+            var roles = (List<String>) claims.get("roles");
+
             @SuppressWarnings("unchecked")
-            var authorities = (List<String>) claims.get("authorities"); // authorities claim
+            var authorities = (List<String>) claims.get("authorities");
 
             var grantedAuthorities = authorities.stream()
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
 
-            // Add roles as prefixed authorities (optional)
+            // Add roles prefixed with "ROLE_"
             grantedAuthorities.addAll(
                     roles.stream()
                             .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                            .collect(Collectors.toList())
+                            .toList()
             );
 
             var authToken = new UsernamePasswordAuthenticationToken(
-                    userId, null, grantedAuthorities
+                    userPublicId, null, grantedAuthorities
             );
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
         } catch (Exception ex) {
-            SecurityContextHolder.clearContext(); // invalid token
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+            return;
         }
 
         filterChain.doFilter(request, response);

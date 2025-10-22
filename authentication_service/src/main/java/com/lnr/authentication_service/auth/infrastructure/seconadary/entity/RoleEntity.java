@@ -2,11 +2,9 @@ package com.lnr.authentication_service.auth.infrastructure.seconadary.entity;
 
 import com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount;
 import com.lnr.authentication_service.auth.domain.account.vo.RoleName;
+import com.lnr.authentication_service.shared.jpa.AbstractAuditingEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 import java.util.UUID;
@@ -18,12 +16,14 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RoleEntity {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class RoleEntity extends AbstractAuditingEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
+    @EqualsAndHashCode.Include
     private UUID publicId;
 
     @Enumerated(EnumType.STRING)
@@ -34,7 +34,7 @@ public class RoleEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserAccountEntity user; // Owner reference
 
-    @OneToMany(orphanRemoval = false)
+    @OneToMany(orphanRemoval = false,cascade = CascadeType.ALL)
     private Set<AuthorityEntity> authorities;
 
     // --- Mappers ---

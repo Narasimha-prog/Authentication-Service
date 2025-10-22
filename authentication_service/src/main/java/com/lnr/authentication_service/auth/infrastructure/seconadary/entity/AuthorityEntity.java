@@ -1,5 +1,6 @@
 package com.lnr.authentication_service.auth.infrastructure.seconadary.entity;
 import com.lnr.authentication_service.auth.domain.account.vo.AuthorityName;
+import com.lnr.authentication_service.shared.jpa.AbstractAuditingEntity;
 import com.lnr.authentication_service.user.infrastrature.seconadary.entity.UserProfileEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthorityEntity {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class AuthorityEntity extends AbstractAuditingEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "auth_user_seq")
@@ -21,6 +23,7 @@ public class AuthorityEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @EqualsAndHashCode.Include
     private UUID publicId;
 
     @Enumerated(EnumType.STRING)

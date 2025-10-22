@@ -12,7 +12,11 @@ spring:
     change-log: classpath:db/changelog/master.xml
     default-schema: public
     contexts: dev
+    enabled: false
 
 logging:
   level:
     root: INFO
+
+server:
+  port: 7878

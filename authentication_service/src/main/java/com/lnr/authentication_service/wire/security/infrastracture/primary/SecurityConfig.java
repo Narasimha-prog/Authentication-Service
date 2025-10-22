@@ -32,7 +32,7 @@ public class SecurityConfig {
     "/actuator/info"
   };
 
-  private static final String[] PUBLIC_KEY_WHITELIST={"/.well-known/**"};
+  private static final String[] PUBLIC_KEY_WHITELIST={"/.well-known/**","/auth/api/register"};
 
   @Bean
   public SecurityFilterChain configure(HttpSecurity http) throws Exception {

@@ -3,7 +3,8 @@ package com.lnr.authentication_service.auth.infrastructure.primary;
 
 import com.lnr.authentication_service.auth.infrastructure.seconadary.entity.RefreshTokenEntity;
 import com.lnr.authentication_service.auth.infrastructure.seconadary.entity.UserAccountEntity;
-import com.lnr.authentication_service.auth.infrastructure.seconadary.repository.JpaRefreshTokenRepository;
+import com.lnr.authentication_service.auth.infrastructure.seconadary.repository.IJpaRefreshTokenRepository;
+import com.lnr.authentication_service.auth.infrastructure.seconadary.services.JwtService;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -12,10 +13,10 @@ import java.util.UUID;
 @Service
 public class RefreshTokenService {
 
-    private final JpaRefreshTokenRepository refreshTokenRepository;
+    private final IJpaRefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
 
-    public RefreshTokenService(JpaRefreshTokenRepository refreshTokenRepository, JwtService jwtService) {
+    public RefreshTokenService(IJpaRefreshTokenRepository refreshTokenRepository, JwtService jwtService) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.jwtService = jwtService;
     }
@@ -34,14 +35,14 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-    public boolean isValid(String token) {
-        return refreshTokenRepository.findByToken(token)
-                .filter(rt -> rt.getExpiryDate().isAfter(Instant.now()))
-                .isPresent();
-    }
+//    public boolean isValid(String token) {
+//        return refreshTokenRepository.findByToken(token)
+//                .filter(rt -> rt.getExpiryDate().isAfter(Instant.now()))
+//                .isPresent();
+//    }
 
-    public void revokeToken(UUID token) {
-        refreshTokenRepository.deleteByPublicId(token);
-    }
+//    public void revokeToken(UUID token) {
+//        refreshTokenRepository.deleteByPublicId(token);
+//    }
 }
 

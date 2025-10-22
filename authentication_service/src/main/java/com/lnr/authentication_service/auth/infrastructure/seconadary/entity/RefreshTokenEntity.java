@@ -1,11 +1,9 @@
 package com.lnr.authentication_service.auth.infrastructure.seconadary.entity;
 
 import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
+import com.lnr.authentication_service.shared.jpa.AbstractAuditingEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -16,7 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RefreshTokenEntity {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class RefreshTokenEntity extends AbstractAuditingEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "refresh_token_seq")
@@ -24,26 +23,32 @@ public class RefreshTokenEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @EqualsAndHashCode.Include
     private UUID publicId; // DDD friendly external ID
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false) // ✅ link directly to user
     private UserAccountEntity user;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true,length = 2048)
     private String token;
 
     @Column(nullable = false)
     private Instant expiryDate;
 
     // --- Mappers ---
-    public com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken toDomain() {
+    public static com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken toDomain(RefreshTokenEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
         return new com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken(
-                token,
-                new UserPublicId(user.getPublicId()),
-                expiryDate
+                entity.getToken(),
+                new UserPublicId(entity.getUser().getPublicId()),
+                entity.getExpiryDate()
         );
     }
+
 
     public static RefreshTokenEntity fromDomain(com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken domain) {
         RefreshTokenEntity entity = new RefreshTokenEntity();

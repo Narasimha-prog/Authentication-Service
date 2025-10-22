@@ -11,13 +11,13 @@ import lombok.*;
 
 import java.util.UUID;
 
-@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true,callSuper = false)
 public class UserProfileEntity extends AbstractAuditingEntity<Long> {
 
     @Id
@@ -26,6 +26,7 @@ public class UserProfileEntity extends AbstractAuditingEntity<Long> {
     private Long id; // database primary key
 
     @Column(nullable = false, unique = true)
+    @EqualsAndHashCode.Include
     private UUID publicId; // exposed to frontend
 
     @Column(nullable = false)
