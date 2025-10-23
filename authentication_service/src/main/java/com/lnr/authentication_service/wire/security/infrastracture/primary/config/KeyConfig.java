@@ -1,4 +1,4 @@
-package com.lnr.authentication_service.auth.infrastructure.primary;
+package com.lnr.authentication_service.wire.security.infrastracture.primary.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

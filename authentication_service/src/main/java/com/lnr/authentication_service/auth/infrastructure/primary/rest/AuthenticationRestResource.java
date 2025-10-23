@@ -1,8 +1,8 @@
-package com.lnr.authentication_service.auth.infrastructure.primary;
+package com.lnr.authentication_service.auth.infrastructure.primary.rest;
 
 import com.lnr.authentication_service.auth.application.AccountApplicationService;
+import com.lnr.authentication_service.auth.infrastructure.primary.dto.RestAccount;
 import com.lnr.authentication_service.auth.infrastructure.primary.dto.RestAuthTokens;
-import com.lnr.authentication_service.auth.infrastructure.primary.dto.RestRegister;
 import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,8 +23,8 @@ public class AuthenticationRestResource {
    private final PasswordEncoder encoder;
 
     @PostMapping("/register")
-    public ResponseEntity<RestAuthTokens> login(@RequestBody RestRegister register) {
-       RestAuthTokens tokens= RestAuthTokens.fromDomain(service.saveAccount(RestRegister.toDomain(register,encoder, new UserPublicId(UUID.randomUUID()))));
+    public ResponseEntity<RestAuthTokens> login(@RequestBody RestAccount register) {
+       RestAuthTokens tokens= RestAuthTokens.fromDomain(service.saveAccount(RestAccount.toDomain(register,encoder, new UserPublicId(UUID.randomUUID()))));
       return  ResponseEntity.status(HttpStatus.CREATED).body(tokens);
     }
 

@@ -1,17 +1,21 @@
-package com.lnr.authentication_service.auth.infrastructure.primary;
+package com.lnr.authentication_service.auth.infrastructure.primary.service;
 
 
+import com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken;
+import com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount;
+import com.lnr.authentication_service.auth.domain.account.services.ITokenService;
 import com.lnr.authentication_service.auth.infrastructure.seconadary.entity.RefreshTokenEntity;
 import com.lnr.authentication_service.auth.infrastructure.seconadary.entity.UserAccountEntity;
 import com.lnr.authentication_service.auth.infrastructure.seconadary.repository.IJpaRefreshTokenRepository;
-import com.lnr.authentication_service.auth.infrastructure.seconadary.services.JwtService;
+import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class RefreshTokenService {
+public class RefreshTokenService implements ITokenService {
 
     private final IJpaRefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
@@ -21,25 +25,25 @@ public class RefreshTokenService {
         this.jwtService = jwtService;
     }
 
-    public RefreshTokenEntity createRefreshToken(UserAccountEntity user) {
-        UUID userId = user.getPublicId();
+    public RefreshToken createRefreshToken(UserAccount user) {
+        UUID userId = user.getPublicId().value();
+
         String token = jwtService.generateRefreshToken(userId);
 
         RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
                 .publicId(UUID.randomUUID())
-                .user(user)
+                .user(UserAccountEntity.fromDomain(user))
                 .token(token)
                 .expiryDate(Instant.now().plusSeconds(7 * 24 * 60 * 60)) // 7 days
                 .build();
 
-        return refreshTokenRepository.save(refreshToken);
+        return RefreshTokenEntity.toDomain(refreshTokenRepository.save(refreshToken));
     }
 
-//    public boolean isValid(String token) {
-//        return refreshTokenRepository.findByToken(token)
-//                .filter(rt -> rt.getExpiryDate().isAfter(Instant.now()))
-//                .isPresent();
-//    }
+
+    public Optional<RefreshToken> findByPublicId(UserPublicId publicId) {
+        return refreshTokenRepository.findByPublicId(publicId.value()).map(RefreshTokenEntity::toDomain);
+    }
 
 //    public void revokeToken(UUID token) {
 //        refreshTokenRepository.deleteByPublicId(token);

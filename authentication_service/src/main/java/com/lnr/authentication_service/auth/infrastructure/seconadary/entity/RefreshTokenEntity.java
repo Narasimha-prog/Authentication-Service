@@ -1,5 +1,6 @@
 package com.lnr.authentication_service.auth.infrastructure.seconadary.entity;
 
+import com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken;
 import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
 import com.lnr.authentication_service.shared.jpa.AbstractAuditingEntity;
 import jakarta.persistence.*;
@@ -50,7 +51,7 @@ public class RefreshTokenEntity extends AbstractAuditingEntity<Long> {
     }
 
 
-    public static RefreshTokenEntity fromDomain(com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken domain) {
+    public static RefreshTokenEntity fromDomain(RefreshToken domain) {
         RefreshTokenEntity entity = new RefreshTokenEntity();
         entity.setPublicId(UUID.randomUUID());
         entity.setToken(domain.getToken());

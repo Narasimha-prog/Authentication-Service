@@ -1,4 +1,4 @@
-package com.lnr.authentication_service.wire.security.infrastracture.primary;
+package com.lnr.authentication_service.wire.security.infrastracture.primary.config;
 
 
 import lombok.RequiredArgsConstructor;

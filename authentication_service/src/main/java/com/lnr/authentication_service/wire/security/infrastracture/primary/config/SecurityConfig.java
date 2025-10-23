@@ -1,16 +1,22 @@
-package com.lnr.authentication_service.wire.security.infrastracture.primary;
+package com.lnr.authentication_service.wire.security.infrastracture.primary.config;
 
-import com.lnr.authentication_service.auth.infrastructure.primary.JwtAuthenticationFilter;
+import com.lnr.authentication_service.wire.security.infrastracture.primary.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -32,9 +38,46 @@ public class SecurityConfig {
     "/actuator/info"
   };
 
-  private static final String[] PUBLIC_KEY_WHITELIST={"/.well-known/**","/auth/api/register"};
+  private static final String[] PUBLIC_KEY_WHITELIST={"/.well-known/**","/auth/api/register","/register"};
 
+
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http)
+            throws Exception {
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
+                OAuth2AuthorizationServerConfigurer.authorizationServer();
+
+        http
+                .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+                .with(authorizationServerConfigurer, (authorizationServer) ->
+                        authorizationServer
+                                .oidc(Customizer.withDefaults())	// Enable OpenID Connect 1.0
+                )
+                .authorizeHttpRequests((authorize) ->
+                        authorize
+                                .anyRequest().authenticated()
+                )
+                // Redirect to the login page when not authenticated from the
+                // authorization endpoint
+                .exceptionHandling((exceptions) -> exceptions
+                        .defaultAuthenticationEntryPointFor(
+                                new LoginUrlAuthenticationEntryPoint("/login"),
+                                new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
+                        )
+                );
+        http.formLogin(form -> form
+                .loginPage("/login")           // custom login page
+                .loginProcessingUrl("/login_sub")  // POST target for Spring Security
+                .defaultSuccessUrl("/dashboard", true)
+                .failureUrl("/login?error=true")
+        );
+
+        return http.build();
+    }
   @Bean
+  @Order(2)
   public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
     http

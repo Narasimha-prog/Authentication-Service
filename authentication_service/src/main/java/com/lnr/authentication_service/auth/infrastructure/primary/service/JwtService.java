@@ -1,4 +1,4 @@
-package com.lnr.authentication_service.auth.infrastructure.seconadary.services;
+package com.lnr.authentication_service.auth.infrastructure.primary.service;
 
 import com.lnr.authentication_service.auth.domain.account.aggrigate.Role;
 import com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount;

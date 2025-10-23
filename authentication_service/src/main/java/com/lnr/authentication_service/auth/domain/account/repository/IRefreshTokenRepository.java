@@ -13,7 +13,7 @@ public interface IRefreshTokenRepository {
     RefreshToken save(RefreshToken refreshToken, UserAccount account);
 
     /** Find a refresh token by token string */
-    Optional<RefreshToken> findByToken(String token);
+    Optional<RefreshToken> findByPublicId(UserPublicId publicId);
 
     /** Delete a refresh token */
     void delete(RefreshToken refreshToken);

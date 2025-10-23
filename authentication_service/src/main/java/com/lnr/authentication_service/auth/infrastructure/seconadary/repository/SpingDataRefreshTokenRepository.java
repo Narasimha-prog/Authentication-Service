@@ -45,9 +45,10 @@ public class SpingDataRefreshTokenRepository implements IRefreshTokenRepository 
     }
 
     @Override
-    public Optional<RefreshToken> findByToken(String token) {
-        return Optional.empty();
+    public Optional<RefreshToken> findByPublicId(UserPublicId publicId) {
+        return refreshTokenRepository.findByPublicId(publicId.value()).map(RefreshTokenEntity::toDomain);
     }
+
 
     @Override
     public void delete(RefreshToken refreshToken) {
