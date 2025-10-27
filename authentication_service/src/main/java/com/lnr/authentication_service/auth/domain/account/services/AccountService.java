@@ -14,7 +14,8 @@ public class AccountService {
 
     private final IAccountRepository accountRepository;
 
-   private final IAuthService authService;
+
+
 
     public Optional<UserAccount> findByPublicId(UserPublicId publicId){
         return accountRepository.findByPublicId(publicId);
@@ -25,8 +26,8 @@ public class AccountService {
     }
 
 
-    public AuthTokens save(UserAccount  account){
-      UserAccount newUserAccount= accountRepository.save(account);
-     return authService.generateTokensFor(newUserAccount);
+    public UserAccount save(UserAccount  account){
+     return  accountRepository.save(account);
+
     }
 }

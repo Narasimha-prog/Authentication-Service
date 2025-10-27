@@ -2,25 +2,29 @@ package com.lnr.authentication_service.auth.domain.account.repository;
 
 import com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken;
 import com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount;
+import com.lnr.authentication_service.auth.domain.account.vo.RefreshPublicId;
 import com.lnr.authentication_service.auth.infrastructure.seconadary.entity.RefreshTokenEntity;
 import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface IRefreshTokenRepository {
 
-    /** Save a new refresh token */
-    RefreshToken save(RefreshToken refreshToken, UserAccount account);
 
-    /** Find a refresh token by token string */
-    Optional<RefreshToken> findByPublicId(UserPublicId publicId);
+        public interface IRefreshTokenRepository {
 
-    /** Delete a refresh token */
-    void delete(RefreshToken refreshToken);
+            RefreshToken save(RefreshToken refreshToken, UserAccount account);
 
-    /** Delete all refresh tokens for a given user */
-    void deleteAllByUser(UserPublicId userId);
+            Optional<RefreshToken> findByPublicId(RefreshPublicId publicId);
 
-    /** Check if a refresh token exists */
-    boolean existsByToken(String token);
-}
+            Optional<RefreshToken> findByToken(String token);
+
+            boolean existsByToken(String token);
+
+            void deleteByPublicId(RefreshPublicId publicId);
+
+            void deleteAllByUser(UserPublicId userId);
+
+            List<RefreshTokenEntity> findAllByUserPublicId(UserPublicId userPublicId);
+        }
+

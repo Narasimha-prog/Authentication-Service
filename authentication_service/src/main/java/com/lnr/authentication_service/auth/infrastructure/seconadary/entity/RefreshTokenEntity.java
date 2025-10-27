@@ -1,6 +1,9 @@
 package com.lnr.authentication_service.auth.infrastructure.seconadary.entity;
 
 import com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken;
+import com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount;
+import com.lnr.authentication_service.auth.domain.account.vo.RefreshDbId;
+import com.lnr.authentication_service.auth.domain.account.vo.RefreshPublicId;
 import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
 import com.lnr.authentication_service.shared.jpa.AbstractAuditingEntity;
 import jakarta.persistence.*;
@@ -37,26 +40,36 @@ public class RefreshTokenEntity extends AbstractAuditingEntity<Long> {
     @Column(nullable = false)
     private Instant expiryDate;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean revoked = false;
+
     // --- Mappers ---
-    public static com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken toDomain(RefreshTokenEntity entity) {
+
+    public static RefreshToken toDomain(RefreshTokenEntity entity) {
         if (entity == null) {
             return null;
         }
 
-        return new com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken(
-                entity.getToken(),
-                new UserPublicId(entity.getUser().getPublicId()),
-                entity.getExpiryDate()
+        return new RefreshToken(
+                new RefreshPublicId(entity.getPublicId()),        // maps UUID → value object
+                entity.getToken(),                                // maps token string
+                new UserPublicId(entity.getUser().getPublicId()), // maps user
+                entity.getExpiryDate(),                           // maps expiry
+                false,                                            // revoked flag (if not persisted yet)
+                new RefreshDbId(entity.getId())                   // maps DB ID
         );
+
     }
 
 
-    public static RefreshTokenEntity fromDomain(RefreshToken domain) {
+    public static RefreshTokenEntity fromDomain(RefreshToken domain, UserAccount userAccount) {
         RefreshTokenEntity entity = new RefreshTokenEntity();
         entity.setPublicId(UUID.randomUUID());
         entity.setToken(domain.getToken());
         entity.setExpiryDate(domain.getExpiryDate());
-        // user should be set by caller: entity.setUser(userEntity);
+        entity.setUser(UserAccountEntity.fromDomain(userAccount));
+        entity.setId(domain.getDbId() == null ? null : entity.getId());
+        entity.setRevoked(domain.isRevoked() && entity.isRevoked());
         return entity;
     }
 }

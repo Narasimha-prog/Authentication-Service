@@ -16,11 +16,5 @@ public record RefreshTokenRestDto(String token, String userId, String expiryDate
         );
     }
 
-    public RefreshToken toDomain() {
-        return new RefreshToken(
-                token,
-                new UserPublicId(UUID.fromString(userId)),
-                Instant.parse(expiryDate)
-        );
-    }
+
 }

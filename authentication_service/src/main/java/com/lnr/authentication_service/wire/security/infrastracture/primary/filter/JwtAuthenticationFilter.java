@@ -2,6 +2,7 @@ package com.lnr.authentication_service.wire.security.infrastracture.primary.filt
 
 import com.lnr.authentication_service.auth.application.AccountApplicationService;
 import com.lnr.authentication_service.auth.infrastructure.primary.service.JwtService;
+import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +30,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        String path = request.getServletPath();
+
+        // Skip JWT check for login, registration, and other public pages
+        if (path.equals("/login_sub") || path.equals("/login") || path.equals("/register")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -45,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String userPublicId = claims.getSubject();
 
             // ✅ Check if user exists in DB
-            var userEntityOpt = service.findAccountByPublicId(UUID.fromString(userPublicId));
+            var userEntityOpt = service.findAccountByPublicId(new UserPublicId(UUID.fromString(userPublicId)));
             if (userEntityOpt != null) {
                 SecurityContextHolder.clearContext();
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid user");

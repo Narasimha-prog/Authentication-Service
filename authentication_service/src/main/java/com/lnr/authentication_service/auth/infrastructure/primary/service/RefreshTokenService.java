@@ -4,6 +4,7 @@ package com.lnr.authentication_service.auth.infrastructure.primary.service;
 import com.lnr.authentication_service.auth.domain.account.aggrigate.RefreshToken;
 import com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount;
 import com.lnr.authentication_service.auth.domain.account.services.ITokenService;
+import com.lnr.authentication_service.auth.domain.account.vo.RefreshPublicId;
 import com.lnr.authentication_service.auth.infrastructure.seconadary.entity.RefreshTokenEntity;
 import com.lnr.authentication_service.auth.infrastructure.seconadary.entity.UserAccountEntity;
 import com.lnr.authentication_service.auth.infrastructure.seconadary.repository.IJpaRefreshTokenRepository;
@@ -18,26 +19,49 @@ import java.util.UUID;
 public class RefreshTokenService implements ITokenService {
 
     private final IJpaRefreshTokenRepository refreshTokenRepository;
-    private final JwtService jwtService;
 
-    public RefreshTokenService(IJpaRefreshTokenRepository refreshTokenRepository, JwtService jwtService) {
+
+    public RefreshTokenService(IJpaRefreshTokenRepository refreshTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
-        this.jwtService = jwtService;
+
     }
 
-    public RefreshToken createRefreshToken(UserAccount user) {
-        UUID userId = user.getPublicId().value();
 
-        String token = jwtService.generateRefreshToken(userId);
+    @Override
+    public void revokeTokensByUser(UserPublicId userPublicId) {
+         refreshTokenRepository.deleteAllByUserPublicId(userPublicId.value());
+    }
 
+    @Override
+    public void revokeToken(RefreshPublicId tokenPublicId) {
+      refreshTokenRepository.deleteByPublicId(tokenPublicId.value());
+    }
+
+    @Override
+    public void saveTokens(UserAccount account) {
+
+    }
+
+    @Override
+    public Optional<RefreshToken> findByPublicId(RefreshPublicId publicId) {
+        return refreshTokenRepository.findByPublicId(publicId.value()).map(RefreshTokenEntity::toDomain);
+    }
+
+    @Override
+    public Optional<RefreshToken> findByToken(String token) {
+       return refreshTokenRepository.findByToken(token).map(RefreshTokenEntity::toDomain);
+    }
+
+
+    public void saveSpringRefreshToken(UserAccount user, String tokenValue, Instant expiryDate) {
         RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
                 .publicId(UUID.randomUUID())
                 .user(UserAccountEntity.fromDomain(user))
-                .token(token)
-                .expiryDate(Instant.now().plusSeconds(7 * 24 * 60 * 60)) // 7 days
+                .token(tokenValue)
+                .expiryDate(expiryDate)
                 .build();
 
-        return RefreshTokenEntity.toDomain(refreshTokenRepository.save(refreshToken));
+        refreshTokenRepository.save(refreshToken);
     }
 
 
@@ -45,8 +69,6 @@ public class RefreshTokenService implements ITokenService {
         return refreshTokenRepository.findByPublicId(publicId.value()).map(RefreshTokenEntity::toDomain);
     }
 
-//    public void revokeToken(UUID token) {
-//        refreshTokenRepository.deleteByPublicId(token);
-//    }
+
 }
 
