@@ -65,8 +65,8 @@ public class SecurityConfig {
                                 new LoginUrlAuthenticationEntryPoint("/login"),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
-                )
-                .formLogin(Customizer.withDefaults());
+                );
+
 
         return http.build();
     }
@@ -108,9 +108,23 @@ public class SecurityConfig {
 
       )
       // Add JWT filter before UsernamePasswordAuthenticationFilter
-      .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+      .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
-      return http.build();
+            // ✅ Add form login here
+            .formLogin(form -> form
+                    .loginPage("/login")                // GET /login shows your Thymeleaf page
+                    .loginProcessingUrl("/login")       // POST /login handled by Spring Security
+                    .failureUrl("/login?error=true")
+                    // After login, resume OAuth2 flow instead of redirecting to /
+                    .successHandler((request, response, authentication) -> {
+                        response.sendRedirect("/oauth2/authorize?" + request.getQueryString());
+                    })
+                    .permitAll()
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+
+        return http.build();
   }
 }
 

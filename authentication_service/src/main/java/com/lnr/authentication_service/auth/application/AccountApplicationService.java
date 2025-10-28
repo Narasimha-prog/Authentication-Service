@@ -35,10 +35,7 @@ public class   AccountApplicationService {
         return service.findByPublicId(new UserPublicId(publicId.value())).orElseThrow(()->new UserAccountNotFound("UserAccount is not there for this id"));
     }
 
-//    @Transactional
-//    public AuthTokens loginAccount(UserAccount account){
-//        return tokenService.generateTokens(account);
-//    }
+
 
     @Transactional(readOnly = true)
     public UserAccount findAccountByEmail(UserEmail userEmail) {

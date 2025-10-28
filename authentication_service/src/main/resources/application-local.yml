@@ -17,6 +17,40 @@ spring:
 logging:
   level:
     root: INFO
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet: DEBUG
+    org.springframework.security: DEBUG
+    org.thymeleaf: DEBUG
+    org.springframework.boot.autoconfigure.thymeleaf: DEBUG
+
+oauth2:
+  clients:
+    - clientId: web-client
+      clientSecret: secret
+      redirectUri: http://localhost:4200/login/oauth2/code/web-client
+      scopes:
+        - openid
+        - profile
+      grantTypes:
+          - authorization_code
+          - refresh_token
+
+application:
+  cors:
+    allowed-origins:
+      - "http://localhost:4200"
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+    allowed-headers:
+      - Authorization
+      - Content-Type
+      - Accept
+    allow-credentials: true
+    max-age: 3600
 
 server:
   port: 7878

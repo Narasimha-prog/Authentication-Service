@@ -17,6 +17,28 @@ spring:
     default-schema: public
     contexts: dev
 
+  devtools:
+    restart:
+      enabled: true          # Enable automatic restart
+    livereload:
+      enabled: true          # Enable LiveReload for static/template changes
+
+  spring:
+    security:
+      oauth2:
+        client:
+          registration:
+            web-client:
+              client-id: web-client
+              client-secret: secret
+              scope: openid, profile, email
+              authorization-grant-type: authorization_code
+              redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+              client-name: Angular Web Client
+          provider:
+            web-client:
+              issuer-uri: http://localhost:7878
+
 logging:
   level:
     root: INFO

@@ -2,6 +2,7 @@ package com.lnr.authentication_service.wire.security.infrastracture.primary.conf
 
 
 import com.lnr.authentication_service.auth.infrastructure.primary.service.CustomOAuth2AuthorizationService;
+import com.lnr.authentication_service.wire.security.infrastracture.primary.OAuth2ClientsProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,27 +14,36 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 
+import java.util.List;
 import java.util.UUID;
 
 @Configuration
 public class AuthorizationServerConfig {
 
-    @Bean
-    public RegisteredClientRepository registeredClientRepository(PasswordEncoder encoder) {
-        RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("oidc-client")
-                .clientSecret(encoder.encode("secret"))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:7878/login/oauth2/code/oidc-client")
-                .postLogoutRedirectUri("http://127.0.0.1:8080/")
-                .scope("openid")
-                .scope("profile")
-                .build();
 
-        return new InMemoryRegisteredClientRepository(oidcClient);
+    @Bean
+    public RegisteredClientRepository registeredClientRepository(
+            OAuth2ClientsProperties props, PasswordEncoder encoder) {
+
+        List<RegisteredClient> clients = props.getClients().stream()
+                .map(c -> {
+                    RegisteredClient.Builder builder = RegisteredClient
+                            .withId(UUID.randomUUID().toString())
+                            .clientId(c.getClientId())
+                            .clientSecret(encoder.encode(c.getClientSecret()))
+                            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+
+                    c.getGrantTypes().forEach(gt ->
+                            builder.authorizationGrantType(new AuthorizationGrantType(gt))
+                    );
+                    c.getScopes().forEach(builder::scope);
+                    builder.redirectUri(c.getRedirectUri());
+                    return builder.build();
+                }).toList();
+
+        return new InMemoryRegisteredClientRepository(clients);
     }
+
 
     /**
      * ✅ Basic Authorization Server Settings (issuer, etc.)
