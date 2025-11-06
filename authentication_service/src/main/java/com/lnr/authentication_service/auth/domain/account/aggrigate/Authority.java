@@ -1,7 +1,6 @@
 package com.lnr.authentication_service.auth.domain.account.aggrigate;
 
-import com.lnr.authentication_service.auth.domain.account.vo.AccountDbId;
-import com.lnr.authentication_service.auth.domain.account.vo.AuthorityName;
+import com.lnr.authentication_service.auth.domain.account.vo.*;
 import com.lnr.authentication_service.shared.error.domain.Assert;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,24 +14,27 @@ import org.jilt.Builder;
 public class Authority {
 
     @EqualsAndHashCode.Include
+    private final AuthorityPublicId publicId;
+
     private final AuthorityName name;
 
-    private final AccountDbId dbId;
+    private final RolePublicId rolePublicId;
 
     // All-args constructor
-    public Authority(AuthorityName name, AccountDbId dbId) {
-        assertAllFields(name,dbId);
+    public Authority(AuthorityPublicId publicId, AuthorityName name, RolePublicId rolePublicId) {
+
+        assertAllFields(publicId,name,rolePublicId);
+        this.publicId = publicId;
+        this.rolePublicId = rolePublicId;
         this.name = name;
-        this.dbId = dbId;
+
     }
 
-    // Convenience constructor for new Authority
-    public Authority(AuthorityName name) {
-        this(name, new AccountDbId(0L)); // dbId = 0 means not persisted
-    }
 
-    private void assertAllFields(AuthorityName name,AccountDbId dbId) {
+
+    private void assertAllFields(AuthorityPublicId publicId,AuthorityName name,RolePublicId rolePublicId) {
+        Assert.notNull("AuthorityPublicId",publicId);
         Assert.notNull("AuthorityName", name);
-        Assert.notNull("AuthorityDatabaseId",dbId);
+        Assert.notNull("RolePublicId",rolePublicId);
     }
 }

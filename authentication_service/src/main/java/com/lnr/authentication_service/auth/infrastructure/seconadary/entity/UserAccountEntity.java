@@ -1,6 +1,8 @@
 package com.lnr.authentication_service.auth.infrastructure.seconadary.entity;
 
 
+import com.lnr.authentication_service.auth.domain.account.aggrigate.Role;
+import com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount;
 import com.lnr.authentication_service.auth.domain.account.vo.*;
 import com.lnr.authentication_service.shared.domain.user.vo.UserEmail;
 import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
@@ -27,8 +29,7 @@ public class UserAccountEntity extends AbstractAuditingEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, updatable = false)
-    private Long id; // internal database primary key
+    private Long id;   // internal database primary key
 
     @Column(name = "public_id", nullable = false, unique = true, updatable = false)
     @EqualsAndHashCode.Include
@@ -43,8 +44,13 @@ public class UserAccountEntity extends AbstractAuditingEntity<Long> {
     @Column(name = "last_seen", nullable = false)
     private Instant lastSeen; // persisted as timestamp, represents UserLastSeen
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.EAGER)
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "account_roles",
+            joinColumns = @JoinColumn(name = "account_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "role_id", nullable = false))
     private Set<RoleEntity> roles = new HashSet<>();
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<RefreshTokenEntity> refreshTokens = new HashSet<>();
@@ -78,11 +84,11 @@ public class UserAccountEntity extends AbstractAuditingEntity<Long> {
         // Default role
         RoleEntity defaultRole = new RoleEntity();
         defaultRole.setName(RoleName.USER);
-        defaultRole.setUser(this);
-        defaultRole.setAuthorities(Set.of(defaultAuthority));
+        defaultRole.getAuthorities().add(defaultAuthority);
+        defaultRole.getUsers().add(this);
 
         // Link authority to role
-        defaultAuthority.setRole(defaultRole);
+        defaultAuthority.getRoles().add(defaultRole);
 
         // Add role to user
         this.roles.add(defaultRole);
@@ -115,22 +121,19 @@ public class UserAccountEntity extends AbstractAuditingEntity<Long> {
     }
 
     // --- Mappers ---
-    public static com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount toDomain(UserAccountEntity entity) {
-        if (entity == null) {
-            return null;
-        }
 
-        Set<com.lnr.authentication_service.auth.domain.account.aggrigate.Role> domainRoles = entity.roles.stream()
+    public UserAccount toDomain() {
+        Set<Role> domainRoles = this.roles.stream()
                 .map(RoleEntity::toDomain)
                 .collect(Collectors.toSet());
 
-        return new com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount(
-                new UserPublicId(entity.publicId),
-                new UserEmail(entity.email),
-                new UserPassword(entity.password),
-                new UserLastSeen(entity.lastSeen),
+        return new UserAccount(
+                new UserPublicId(this.publicId),
+                new UserEmail(this.email),
+                new UserPassword(this.password),
+                new UserLastSeen(this.lastSeen),
                 domainRoles,
-                new AccountDbId(entity.id)
+                new AccountDbId(this.id)
         );
     }
 
@@ -150,8 +153,8 @@ public class UserAccountEntity extends AbstractAuditingEntity<Long> {
         entity.setRoles(roleEntities);
 
         roleEntities.forEach(role -> {
-            role.setUser(entity);
-            role.getAuthorities().forEach(auth -> auth.setUser(entity));
+            role.getUsers().add(entity);
+            role.getAuthorities().forEach(auth -> auth.setRoles(roleEntities));
         });
 
         entity.setRoles(roleEntities);

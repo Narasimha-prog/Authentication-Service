@@ -13,7 +13,7 @@ import java.util.Optional;
 
         public interface IRefreshTokenRepository {
 
-            RefreshToken save(RefreshToken refreshToken, UserAccount account);
+            RefreshToken save(RefreshToken refreshToken, UserAccount account,RefreshPublicId refreshPublicId);
 
             Optional<RefreshToken> findByPublicId(RefreshPublicId publicId);
 

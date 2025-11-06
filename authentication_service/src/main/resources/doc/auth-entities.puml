@@ -1,0 +1,48 @@
+@startuml
+title Authentication Service - Entity Relationships
+
+class UserAccountEntity {
+    Long id
+    UUID publicId
+    String email
+    String password
+    Instant lastSeen
+    ---
+    +Set<RoleEntity> roles
+    +Set<RefreshTokenEntity> refreshTokens
+}
+
+class RoleEntity {
+    Long id
+    UUID publicId
+    RoleName name
+    ---
+    +Set<UserAccountEntity> user
+    +Set<AuthorityEntity> authorities
+}
+
+class AuthorityEntity {
+    Long id
+    UUID publicId
+    AuthorityName name
+    boolean enabled
+    ---
+    +Set<RoleEntity> roles
+}
+
+class RefreshTokenEntity {
+    Long id
+    UUID publicId
+    String token
+    Instant expiryDate
+    boolean revoked
+    ---
+    +UserAccountEntity user
+}
+
+' --- Relationships ---
+UserAccountEntity "1" -- "0..*" RefreshTokenEntity : owns >
+UserAccountEntity "*" -- "*" RoleEntity : account_roles
+RoleEntity "*" -- "*" AuthorityEntity : role_authorities
+
+@enduml

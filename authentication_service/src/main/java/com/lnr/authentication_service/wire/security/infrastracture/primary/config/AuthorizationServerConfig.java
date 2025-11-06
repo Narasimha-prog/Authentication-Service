@@ -25,6 +25,14 @@ public class AuthorizationServerConfig {
     public RegisteredClientRepository registeredClientRepository(
             OAuth2ClientsProperties props, PasswordEncoder encoder) {
 
+        if (props.getClients() == null || props.getClients().isEmpty()) {
+            System.out.println("🚨 No OAuth2 clients loaded from YAML!");
+        } else {
+            props.getClients().forEach(c ->
+                    System.out.println("✅ Loaded client from YAML: " + c.getClientId() + " scopes: " + c.getScopes())
+            );
+        }
+
         List<RegisteredClient> clients = props.getClients().stream()
                 .map(c -> {
                     RegisteredClient.Builder builder = RegisteredClient
@@ -40,6 +48,10 @@ public class AuthorizationServerConfig {
                     builder.redirectUri(c.getRedirectUri());
                     return builder.build();
                 }).toList();
+
+        clients.forEach(c ->
+                System.out.println("✅ Registered client: " + c.getClientId() + " scopes: " + c.getScopes())
+        );
 
         return new InMemoryRegisteredClientRepository(clients);
     }

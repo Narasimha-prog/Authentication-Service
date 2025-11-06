@@ -30,6 +30,6 @@ public class SpringDataAccountRepository implements IAccountRepository {
 
     @Override
     public UserAccount save(UserAccount account) {
-        return UserAccountEntity.toDomain(accountRepository.save(UserAccountEntity.fromDomain(account)));
+        return accountRepository.save(UserAccountEntity.fromDomain(account)).toDomain();
     }
 }

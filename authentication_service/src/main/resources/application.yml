@@ -23,8 +23,7 @@ spring:
     livereload:
       enabled: true          # Enable LiveReload for static/template changes
 
-  spring:
-    security:
+  security:
       oauth2:
         client:
           registration:
@@ -38,6 +37,18 @@ spring:
           provider:
             web-client:
               issuer-uri: http://localhost:7878
+oauth2:
+  clients:
+    - clientId: web-client
+      clientSecret: secret
+      redirectUri: http://localhost:4200/login/oauth2/code/web-client
+      scopes:
+        - openid
+        - profile
+        - email
+      grantTypes:
+        - authorization_code
+        - refresh_token
 
 logging:
   level:

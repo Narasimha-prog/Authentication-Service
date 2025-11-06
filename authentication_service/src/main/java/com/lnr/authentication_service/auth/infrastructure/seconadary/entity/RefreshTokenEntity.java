@@ -22,9 +22,8 @@ import java.util.UUID;
 public class RefreshTokenEntity extends AbstractAuditingEntity<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "refresh_token_seq")
-    @SequenceGenerator(name = "refresh_token_seq", sequenceName = "refresh_token_sequence", allocationSize = 1)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;   // internal database primary key
 
     @Column(nullable = false, unique = true)
     @EqualsAndHashCode.Include
@@ -62,9 +61,9 @@ public class RefreshTokenEntity extends AbstractAuditingEntity<Long> {
     }
 
 
-    public static RefreshTokenEntity fromDomain(RefreshToken domain, UserAccount userAccount) {
+    public static RefreshTokenEntity fromDomain(RefreshToken domain, UserAccount userAccount,RefreshPublicId refreshPublicId) {
         RefreshTokenEntity entity = new RefreshTokenEntity();
-        entity.setPublicId(UUID.randomUUID());
+        entity.setPublicId(refreshPublicId.value());
         entity.setToken(domain.getToken());
         entity.setExpiryDate(domain.getExpiryDate());
         entity.setUser(UserAccountEntity.fromDomain(userAccount));

@@ -59,27 +59,7 @@ public class UserAccount {
         this(publicId, email, password, lastSeen, roles, new AccountDbId(0L));
     }
 
-    // ------------------------
-    // Minimal constructor with default role & authority
-    // ------------------------
-    public UserAccount(UserPublicId publicId,
-                       UserEmail email,
-                       UserPassword password,
-                       UserLastSeen lastSeen) {
-        this(
-                publicId,
-                email,
-                password,
-                lastSeen,
-                Set.of(
-                        new Role(
-                                RoleName.USER,
-                                Set.of(new Authority(AuthorityName.USER_READ))
-                        )
-                ),
-                new AccountDbId(0L)
-        );
-    }
+
 
     // ------------------------
     // Validation
@@ -94,9 +74,7 @@ public class UserAccount {
         Assert.notNull("UserAccountDbId", dbId);
     }
 
-    // ------------------------
-    // Business methods
-    // ------------------------
+
     public UserAccount addRole(Role role) {
         Set<Role> updatedRoles = new java.util.HashSet<>(Set.copyOf(this.roles));
         updatedRoles.add(role);

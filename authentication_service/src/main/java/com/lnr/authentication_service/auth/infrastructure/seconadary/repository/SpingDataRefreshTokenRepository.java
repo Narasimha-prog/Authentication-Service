@@ -20,7 +20,7 @@ public class SpingDataRefreshTokenRepository implements IRefreshTokenRepository 
 
     private final AccountApplicationService applicationService;
 
-  private final IJpaRefreshTokenRepository refreshTokenRepository;
+    private final IJpaRefreshTokenRepository refreshTokenRepository;
 
     @Override
     public List<RefreshTokenEntity> findAllByUserPublicId(UserPublicId userPublicId) {
@@ -34,10 +34,10 @@ public class SpingDataRefreshTokenRepository implements IRefreshTokenRepository 
 
 
     @Override
-    public RefreshToken save(RefreshToken refreshToken, UserAccount account) {
+    public RefreshToken save(RefreshToken refreshToken, UserAccount account,RefreshPublicId refreshPublicId) {
 
 // ✅ Create the refresh token entity
-        RefreshTokenEntity tokenEntity = RefreshTokenEntity.fromDomain(refreshToken,account);
+        RefreshTokenEntity tokenEntity = RefreshTokenEntity.fromDomain(refreshToken,account,refreshPublicId);
 
         // ✅ Fetch the managed user entity (so Hibernate knows it's persisted)
         UserAccountEntity accountEntity = accountRepository

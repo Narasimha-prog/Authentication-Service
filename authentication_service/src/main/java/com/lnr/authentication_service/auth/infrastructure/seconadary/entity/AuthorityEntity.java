@@ -5,11 +5,12 @@ import com.lnr.authentication_service.user.infrastrature.seconadary.entity.UserP
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "authority")
+@Table(name = "authorities")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,10 +18,10 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class AuthorityEntity extends AbstractAuditingEntity<Long> {
 
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "auth_user_seq")
-    @SequenceGenerator(name = "auth_user_seq", sequenceName = "auth_user_sequence", allocationSize = 1)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;   // internal database primary key
 
     @Column(nullable = false, unique = true)
     @EqualsAndHashCode.Include
@@ -31,13 +32,8 @@ public class AuthorityEntity extends AbstractAuditingEntity<Long> {
     private AuthorityName  name;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
-    private RoleEntity role;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserAccountEntity user;
+    @ManyToMany(mappedBy = "authorities", fetch = FetchType.LAZY)
+    private Set<RoleEntity> roles = new HashSet<>();
 
     @Column(nullable = false)
     private boolean enabled = true;
