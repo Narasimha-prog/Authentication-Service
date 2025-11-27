@@ -16,6 +16,13 @@ spring:
     change-log: classpath:db/changelog/master.xml
     default-schema: public
     contexts: dev
+thymeleaf:
+  prefix: classpath:/templates/
+  suffix: .html
+  enabled: true
+  cache: false
+  mode: HTML
+  encoding: UTF-8
 
   devtools:
     restart:
@@ -23,32 +30,7 @@ spring:
     livereload:
       enabled: true          # Enable LiveReload for static/template changes
 
-  security:
-      oauth2:
-        client:
-          registration:
-            web-client:
-              client-id: web-client
-              client-secret: secret
-              scope: openid, profile, email
-              authorization-grant-type: authorization_code
-              redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-              client-name: Angular Web Client
-          provider:
-            web-client:
-              issuer-uri: http://localhost:7878
-oauth2:
-  clients:
-    - clientId: web-client
-      clientSecret: secret
-      redirectUri: http://localhost:4200/login/oauth2/code/web-client
-      scopes:
-        - openid
-        - profile
-        - email
-      grantTypes:
-        - authorization_code
-        - refresh_token
+
 
 logging:
   level:

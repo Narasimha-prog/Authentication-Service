@@ -33,7 +33,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
 
         // Skip JWT check for login, registration, and other public pages
-        if (path.equals("/login_sub") || path.equals("/login") || path.equals("/register")) {
+
+
+        if (request.getServletPath().startsWith("/login") ||
+                request.getServletPath().startsWith("/register") ||
+                request.getServletPath().startsWith("/home") ||
+                request.getServletPath().startsWith("/oauth2") || // auth server
+                request.getServletPath().equals("/") ||
+                request.getServletPath().equals("/favicon.ico")) {
             filterChain.doFilter(request, response);
             return;
         }

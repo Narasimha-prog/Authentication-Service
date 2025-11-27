@@ -9,6 +9,7 @@ import com.lnr.authentication_service.auth.infrastructure.primary.dto.RestAccoun
 import com.lnr.authentication_service.shared.domain.user.vo.UserEmail;
 import com.lnr.authentication_service.shared.domain.user.vo.UserPublicId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,10 +25,7 @@ public class RegistrationPageController {
     private final AccountApplicationService accountService;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
-    @GetMapping("favicon.ico")
-    void favicon() {
-        // Do nothing, avoids NoResourceFoundException
-    }
+
     // Show registration form
     @GetMapping("/register")
     public String showForm(Model model) {
@@ -59,6 +57,11 @@ public class RegistrationPageController {
     public String showLoginForm(Model model) {
         model.addAttribute("register", new RestAccount("",""));
         return "login"; // points to src/main/resources/templates/login.html
+    }
+    @GetMapping("/home")
+    public String home(Model model, Authentication authentication) {
+        System.out.println("Auth principal: " + authentication);
+        return "home";
     }
 
 }

@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.ToString;
 import org.jilt.Builder;
 
+import java.util.Set;
+
 @Getter
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -18,23 +20,28 @@ public class Authority {
 
     private final AuthorityName name;
 
-    private final RolePublicId rolePublicId;
+    private final Set<Role> roles;
+
+    private final boolean enabled;
 
     // All-args constructor
-    public Authority(AuthorityPublicId publicId, AuthorityName name, RolePublicId rolePublicId) {
+    public Authority(AuthorityPublicId publicId, AuthorityName name, Set<Role> roles,boolean enabled) {
 
-        assertAllFields(publicId,name,rolePublicId);
+
+        assertAllFields(publicId,name,roles,enabled);
         this.publicId = publicId;
-        this.rolePublicId = rolePublicId;
+        this.roles = roles;
         this.name = name;
+        this.enabled =enabled;
 
     }
 
 
 
-    private void assertAllFields(AuthorityPublicId publicId,AuthorityName name,RolePublicId rolePublicId) {
+    private void assertAllFields(AuthorityPublicId publicId,AuthorityName name,Set<Role> roles,boolean enabled) {
         Assert.notNull("AuthorityPublicId",publicId);
         Assert.notNull("AuthorityName", name);
-        Assert.notNull("RolePublicId",rolePublicId);
+        Assert.notNull("Roles",roles);
+        Assert.notNull("Enabled",enabled);
     }
 }

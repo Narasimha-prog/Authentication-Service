@@ -20,14 +20,17 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.web.servlet: DEBUG
     org.springframework.security: DEBUG
-    org.thymeleaf: DEBUG
-    org.springframework.boot.autoconfigure.thymeleaf: DEBUG
+    org.springframework.security.oauth: DEBUG
+
+
+
 
 oauth2:
   clients:
     - clientId: web-client
-      clientSecret: secret
-      redirectUri: http://localhost:4200/login/oauth2/code/web-client
+      clientSecret:
+      redirectUri: http://localhost:4000/auth/callback
+
       scopes:
         - openid
         - profile

@@ -1,5 +1,7 @@
 package com.lnr.authentication_service.auth.infrastructure.seconadary.entity;
+import com.lnr.authentication_service.auth.domain.account.aggrigate.Authority;
 import com.lnr.authentication_service.auth.domain.account.vo.AuthorityName;
+import com.lnr.authentication_service.auth.domain.account.vo.AuthorityPublicId;
 import com.lnr.authentication_service.shared.jpa.AbstractAuditingEntity;
 import com.lnr.authentication_service.user.infrastrature.seconadary.entity.UserProfileEntity;
 import jakarta.persistence.*;
@@ -8,6 +10,7 @@ import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "authorities")
@@ -39,15 +42,24 @@ public class AuthorityEntity extends AbstractAuditingEntity<Long> {
     private boolean enabled = true;
 
     // --- Mappers ---
-    public com.lnr.authentication_service.auth.domain.account.aggrigate.Authority toDomain() {
-        return new com.lnr.authentication_service.auth.domain.account.aggrigate.Authority(name);
+
+    public Authority toDomain() {
+        return new Authority(
+                new AuthorityPublicId(publicId),
+                name,
+                roles.stream()
+                        .map(RoleEntity::toDomain)
+                        .collect(Collectors.toSet()),
+                enabled
+        );
     }
 
-    public static AuthorityEntity fromDomain(com.lnr.authentication_service.auth.domain.account.aggrigate.Authority authority) {
+    public static AuthorityEntity fromDomain(Authority authority) {
         return AuthorityEntity.builder()
-                .publicId(UUID.randomUUID())
+                .publicId(authority.getPublicId().value())
+                .roles(authority.getRoles().stream().map(RoleEntity::fromDomain).collect(Collectors.toUnmodifiableSet()))
                 .name(authority.getName())
-                .enabled(true)
+                .enabled(authority.isEnabled())
                 .build();
     }
 
