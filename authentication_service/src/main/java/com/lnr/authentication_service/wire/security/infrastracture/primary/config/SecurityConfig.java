@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
@@ -58,7 +59,10 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/favicon.ico").permitAll()
+                        .requestMatchers("/login",
+                                "/register",
+                                "/favicon.ico",
+                                "/auth/callback").permitAll()
                         .requestMatchers("/auth/api/register").permitAll()
                         .requestMatchers("/.well-known/**").permitAll()
 
@@ -71,14 +75,16 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
+                //login pages
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/home", true)
+                        .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
                         .failureUrl("/login?error")
                         .permitAll()
                 )
 
+                //logout pages
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")

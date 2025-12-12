@@ -1,6 +1,7 @@
-package com.lnr.authentication_service.wire.security.infrastracture.primary.data;
+package com.lnr.authentication_service.auth.infrastructure.primary.data;
 
 import com.lnr.authentication_service.auth.domain.account.aggrigate.UserAccount;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,11 +9,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class UserAccountDetailsAdapter implements UserDetails {
+@Slf4j
+public class UserAccountDetails implements UserDetails {
 
     private final UserAccount user;
 
-    public UserAccountDetailsAdapter(UserAccount user) {
+    public UserAccountDetails(UserAccount user) {
         this.user = user;
     }
 
@@ -31,8 +33,11 @@ public class UserAccountDetailsAdapter implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getEmail().value();
+        System.out.println("Email = " + user.getEmail());
+        System.out.println("Email.value = " + (user.getEmail() != null ? user.getEmail().value() : "NULL"));
+        return user.getEmail() != null ? user.getEmail().value() : null;
     }
+
 
     @Override
     public boolean isAccountNonExpired() {

@@ -41,44 +41,26 @@ public class AuthorizationServerConfig {
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
 
-
         List<RegisteredClient> clients = props.getClients().stream()
                 .map(c -> {
                     RegisteredClient.Builder builder = RegisteredClient
                             .withId(UUID.randomUUID().toString())
-                            .clientId(c.getClientId());
-
-                    // ✅ Handle public clients (SPAs) with no secret
-                    if (c.getClientSecret() == null || c.getClientSecret().isBlank()) {
-                        builder.clientAuthenticationMethod(ClientAuthenticationMethod.NONE);
-                        builder.clientSettings(ClientSettings.builder()
-                                .requireProofKey(true) // ✅ Enforce PKCE
-                                .requireAuthorizationConsent(false)
-                                .build());
-                     log.info(" 🔒 Registered PUBLIC client PKCE: {}" , c.getClientId());
-                    } else {
-                        // ✅ Confidential clients
-                        builder.clientSecret(encoder.encode(c.getClientSecret()));
-                        builder.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
-                        builder.clientSettings(ClientSettings.builder()
-                                .requireProofKey(false)
-                                .requireAuthorizationConsent(false)
-                                .build());
-                     log.info(" 🔒 Registered CONFIDENTIAL client: {}",c.getClientId());
-                    }
-
-                    // Grant types
-                    c.getGrantTypes().forEach(gt ->
-                            builder.authorizationGrantType(new AuthorizationGrantType(gt))
-                    );
-
-                    // Scopes & Redirects
-                    c.getScopes().forEach(builder::scope);
-
-                    builder.redirectUri(c.getRedirectUri());
+                            .clientId(c.getClientId())
+                            .clientSecret(encoder.encode(c.getClientSecret())) // IMPORTANT
+                            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                            .redirectUri(c.getRedirectUri())
+                            .scope("openid")
+                            .scope("profile")
+                            .clientSettings(ClientSettings.builder()
+                                    .requireProofKey(false)  // ❗ Very important: disable PKCE
+                                    .requireAuthorizationConsent(false)
+                                    .build());
 
                     return builder.build();
-                }).toList();
+                })
+                .toList();
 
         return new InMemoryRegisteredClientRepository(clients);
     }

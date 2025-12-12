@@ -20,7 +20,7 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.web.servlet: DEBUG
     org.springframework.security: DEBUG
-    org.springframework.security.oauth: DEBUG
+    org.springframework.security.oauth2: TRACE
 
 
 
@@ -28,7 +28,7 @@ logging:
 oauth2:
   clients:
     - clientId: web-client
-      clientSecret:
+      clientSecret: web-client-secret
       redirectUri: http://localhost:4000/auth/callback
 
       scopes:

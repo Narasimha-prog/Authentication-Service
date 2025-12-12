@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+
+
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
@@ -65,11 +69,10 @@
 
     <h1>Welcome to Authentication Server</h1>
 
-    <div class="info">
-        <p>You are logged in as:
-            <strong th:text="${#authentication != null ? #authentication.name : 'Guest'}"></strong>
-        </p>
-    </div>
+    <p>You are logged in as:
+        <strong sec:authentication="name">Guest</strong>
+    </p>
+
 
     <div class="btn-group">
         <a href="/logout" class="button logout">Logout</a>
