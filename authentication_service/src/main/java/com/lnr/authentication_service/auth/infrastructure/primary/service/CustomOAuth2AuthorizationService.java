@@ -9,15 +9,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Custom implementation of OAuth2AuthorizationService that delegates
@@ -33,15 +37,29 @@ public class CustomOAuth2AuthorizationService implements OAuth2AuthorizationServ
     private final AccountApplicationService applicationService;
     private final RegisteredClientRepository registeredClientRepository;
 
+
+    // In-memory store for authorization codes
+    private final Map<String, OAuth2Authorization> authorizationCodeStore = new ConcurrentHashMap<>();
+
     /**
      * Called when a new OAuth2Authorization (e.g., login or token refresh) is created.
      * We delegate to our domain service to persist a refresh token.
      */
     @Override
     public void save(OAuth2Authorization authorization) {
-        if (authorization == null || authorization.getRefreshToken() == null) {
+        if (authorization == null) {
             return;
         }
+
+        // Save authorization code in memory
+        OAuth2Authorization.Token<OAuth2AuthorizationCode> authorizationCodeToken =
+                authorization.getToken(OAuth2AuthorizationCode.class);
+
+        if (authorizationCodeToken != null) {
+            String code = authorizationCodeToken.getToken().getTokenValue();
+            authorizationCodeStore.put(code, authorization);
+        }
+
 
         OAuth2RefreshToken refreshToken = authorization.getRefreshToken().getToken();
 
@@ -104,25 +122,19 @@ public class CustomOAuth2AuthorizationService implements OAuth2AuthorizationServ
      */
     @Override
     public OAuth2Authorization findByToken(String token, OAuth2TokenType tokenType) {
-
+        // Lookup in-memory authorization code
+        if (tokenType != null && OAuth2ParameterNames.CODE.equals(tokenType.getValue())) {
+            return authorizationCodeStore.get(token);
+        }
+        // Lookup refresh token in DB
         return refreshTokenService.findByToken(token)
                 .map(rt -> {
-                    // Lookup client (depends on your app logic)
                     RegisteredClient client = registeredClientRepository.findByClientId("your-client-id");
-
-                    OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(client)
+                    return OAuth2Authorization.withRegisteredClient(client)
                             .principalName(rt.getUserId().value().toString())
-                            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN);
-
-                    // Add refresh token
-                    builder.token(new OAuth2RefreshToken(
-                            rt.getToken(),
-                            rt.getExpiryDate().minusSeconds(3600),
-                            rt.getExpiryDate()
-                    ));
-
-                    return builder.build();
-                })
-                .orElse(null);
+                            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                            .token(new OAuth2RefreshToken(rt.getToken(), rt.getExpiryDate().minusSeconds(3600), rt.getExpiryDate()))
+                            .build();
+                }).orElse(null);
     }
 }

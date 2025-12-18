@@ -54,7 +54,7 @@ public class AuthorizationServerConfig {
                             .scope("openid")
                             .scope("profile")
                             .clientSettings(ClientSettings.builder()
-                                    .requireProofKey(false)  // ❗ Very important: disable PKCE
+                                    .requireProofKey(true)  // ❗ Very important: disable PKCE
                                     .requireAuthorizationConsent(false)
                                     .build());
 
