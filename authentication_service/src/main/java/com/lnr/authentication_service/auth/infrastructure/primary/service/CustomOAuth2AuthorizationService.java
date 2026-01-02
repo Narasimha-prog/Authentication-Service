@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Custom implementation of OAuth2AuthorizationService that delegates
  * refresh token persistence and revocation to the domain-level RefreshTokenService.
  */
-@Service
+//@Service
 @RequiredArgsConstructor
 @Primary
 public class CustomOAuth2AuthorizationService implements OAuth2AuthorizationService {
